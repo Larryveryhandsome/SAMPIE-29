@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>路竹夜市 - 高雄在地人氣首選</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入外部字體 (可選，這裡使用 Noto Sans TC) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        // 配置 Tailwind 樣式，增加自訂顏色
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#ff6b6b', // 夜市紅
+                        'secondary': '#feca57', // 招牌黃
+                        'dark': '#2d3436', // 文字深色
+                        'light': '#f5f6fa', // 背景淺色
+                    },
+                    fontFamily: {
+                        'sans': ['"Noto Sans TC"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 全域樣式設定 */
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f5f6fa;
+            color: #2d3436;
+            scroll-behavior: smooth; /* 平滑捲動 */
+        }
+        
+        /* 頁首橫幅背景遮罩效果 */
+        .hero-banner {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('image_721657.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* 視差滾動效果 */
+        }
+
+        /* 卡片懸浮效果 */
+        .stall-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stall-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        /* 導覽列模糊背景 */
+        .nav-blur {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* 圖片容器維持比例 */
+        .img-container {
+            position: relative;
+            width: 100%;
+            padding-top: 66.66%; /* 3:2 比例 */
+            overflow: hidden;
+            background-color: #e2e8f0; /* 載入前佔位色 */
+        }
+        .img-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 免責聲明標籤 */
+        .disclaimer-badge {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen">
+
+    <!-- 導覽列 -->
+    <nav class="fixed w-full z-50 nav-blur shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/網站名稱 -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-secondary" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                        </svg>
+                        路竹夜市指南
+                    </a>
+                </div>
+                
+                <!-- 桌面版選單 -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#about" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">夜市簡介</a>
+                    <a href="#info" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">營業資訊</a>
+                    <a href="#food" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">必吃推薦</a>
+                    <a href="#gallery" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">現場剪影</a>
+                </div>
+
+                <!-- 行動版選單按鈕 -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-700 hover:text-primary focus:outline-none p-2">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 行動版選單內容 (預設隱藏) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 shadow-lg absolute w-full">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#about" class="block text-gray-700 hover:text-primary hover:bg-red-50 px-3 py-2 rounded-md text-base font-medium">夜市簡介</a>
+                <a href="#info" class="block text-gray-700 hover:text-primary hover:bg-red-50 px-3 py-2 rounded-md text-base font-medium">營業資訊</a>
+                <a href="#food" class="block text-gray-700 hover:text-primary hover:bg-red-50 px-3 py-2 rounded-md text-base font-medium">必吃推薦</a>
+                <a href="#gallery" class="block text-gray-700 hover:text-primary hover:bg-red-50 px-3 py-2 rounded-md text-base font-medium">現場剪影</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 頁首主視覺 -->
+    <header class="hero-banner h-screen flex flex-col justify-center items-center text-center px-4 relative mt-0">
+        <!-- 免責聲明 -->
+        <div class="absolute top-20 left-1/2 transform -translate-x-1/2 disclaimer-badge bg-yellow-400 text-yellow-900 text-xs md:text-sm font-bold px-4 py-2 rounded-full shadow-lg border-2 border-yellow-500 z-10 w-max max-w-full text-center">
+            ⚠️ 網站標示僅提供路竹夜市官方參考，不具商業性質，無網域。
+        </div>
+
+        <div class="z-10 bg-black bg-opacity-40 p-8 rounded-2xl backdrop-blur-sm border border-white border-opacity-20 max-w-3xl w-full">
+            <h1 class="text-4xl md:text-6xl font-bold text-white mb-4 tracking-wider drop-shadow-lg">
+                <span class="text-secondary">星 期 三 五 六</span><br>
+                <span class="mt-2 block">路 竹 夜 市</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-200 mb-8 font-light drop-shadow-md">
+                高雄路竹區的在地人氣首選，好逛、好吃、好停車！
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#food" class="bg-primary hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300 shadow-lg text-lg">
+                    探索必吃美食
+                </a>
+                <a href="#info" class="bg-white hover:bg-gray-100 text-primary font-bold py-3 px-8 rounded-full transition-colors duration-300 shadow-lg text-lg">
+                    查看營業資訊
+                </a>
+            </div>
+        </div>
+        
+        <!-- 向下箭頭提示 -->
+        <div class="absolute bottom-10 animate-bounce">
+            <a href="#about" class="text-white opacity-80 hover:opacity-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+            </a>
+        </div>
+    </header>
+
+    <!-- 主內容區 -->
+    <main class="flex-grow">
+        
+        <!-- 夜市簡介區塊 -->
+        <section id="about" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">關於路竹夜市</h2>
+                    <div class="mt-2 h-1 w-20 bg-primary mx-auto rounded"></div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6 text-lg text-gray-600 leading-relaxed">
+                        <p>
+                            <strong class="text-primary">路竹夜市</strong>是位於高雄市路竹區的在地人氣夜市，屬於<span class="text-gray-900 font-medium">「偏在地型、觀光客還不算爆多」</span>的舒適逛街好去處。
+                        </p>
+                        <p>
+                            這裡的動線規劃良好，呈現<span class="text-gray-900 font-medium">四方格子狀</span>，攤位種類繁多且重複性不高。走道寬敞，逛起來不太擁擠，非常適合全家大小一起來尋寶。
+                        </p>
+                        <div class="bg-light p-6 rounded-xl border border-gray-100 shadow-sm mt-8">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-secondary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                現場環境特色
+                            </h3>
+                            <ul class="space-y-3">
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">✓</span>
+                                    <span>設有<strong class="text-gray-800">無障礙入口</strong>及<strong class="text-gray-800">洗手間</strong>，適合帶小朋友同行。</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">✓</span>
+                                    <span>攤位動線清楚，不容易迷路。</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-yellow-500 mr-2">⚠️</span>
+                                    <span>交易方式：<strong class="text-red-500">只收現金</strong>，現場目前沒有外送平台合作。</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="relative rounded-2xl overflow-hidden shadow-2xl group">
+                        <img src="image_721926.jpg" alt="" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700" onerror="this.src='https://placehold.co/800x600/e2e8f0/475569?text=路竹夜市招牌'">
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6 text-white">
+                            <p class="font-bold text-xl">經典的霓虹招牌</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 營業資訊區塊 -->
+        <section id="info" class="py-20 bg-light">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">營業與交通資訊</h2>
+                    <div class="mt-2 h-1 w-20 bg-primary mx-auto rounded"></div>
+                    <p class="mt-4 text-gray-600">Google地圖曾誤標「永久歇業」，請放心，目前穩定營業中！</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 時間卡片 -->
+                    <div class="bg-white rounded-2xl p-8 shadow-md border-t-4 border-secondary text-center hover:shadow-xl transition-shadow">
+                        <div class="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">營業時間</h3>
+                        <p class="text-2xl font-black text-primary mb-2">每週三、五、六</p>
+                        <p class="text-gray-600 font-medium">約 18:00 – 23:30</p>
+                        <div class="mt-4 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                            💡 建議 <strong>18:30–20:00</strong> 抵達<br>攤位最齊全，排隊時間也較能接受。
+                        </div>
+                    </div>
+
+                    <!-- 地址卡片 -->
+                    <div class="bg-white rounded-2xl p-8 shadow-md border-t-4 border-primary text-center hover:shadow-xl transition-shadow">
+                        <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">夜市地址</h3>
+                        <p class="text-lg font-medium text-gray-800 mb-4">高雄市路竹區民富街88號</p>
+                        <a href="https://maps.google.com/?q=高雄市路竹區民富街88號" target="_blank" class="inline-flex items-center text-primary hover:text-red-700 font-medium">
+                            在 Google 地圖開啟
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- 交通卡片 -->
+                    <div class="bg-white rounded-2xl p-8 shadow-md border-t-4 border-blue-400 text-center hover:shadow-xl transition-shadow">
+                        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">交通方式</h3>
+                        <div class="text-left space-y-4">
+                            <div>
+                                <h4 class="font-bold text-gray-800 flex items-center gap-2">
+                                    <span>🚗</span> 開車前往
+                                </h4>
+                                <p class="text-gray-600 text-sm ml-6 mt-1">夜市後方設有<strong class="text-green-600">大型免費停車場</strong>，停車非常方便。</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 flex items-center gap-2">
+                                    <span>🚆</span> 大眾運輸
+                                </h4>
+                                <p class="text-gray-600 text-sm ml-6 mt-1">搭乘火車至<strong>路竹火車站</strong>，步行約 <strong class="text-primary">5 分鐘</strong>即可抵達。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 必吃推薦區塊 -->
+        <section id="food" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">熱門必吃清單</h2>
+                    <div class="mt-2 h-1 w-20 bg-primary mx-auto rounded"></div>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">綜合網路評價與在地人推薦，這些攤位經常大排長龍，來路竹夜市絕對不能錯過！</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- 推薦攤位 1 -->
+                    <div class="stall-card bg-white rounded-xl overflow-hidden border border-gray-100 flex flex-col">
+                        <div class="p-6 flex-grow">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold text-gray-900">新宿章魚小丸子</h3>
+                                <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded font-bold">排隊名店</span>
+                            </div>
+                            <p class="text-gray-600">熱門程度極高！通常一開攤就容易出現排隊人潮，是夜市裡的人氣指標。</p>
+                        </div>
+                    </div>
+
+                    <!-- 推薦攤位 2 -->
+                    <div class="stall-card bg-white rounded-xl overflow-hidden border border-gray-100 flex flex-col">
+                         <div class="img-container">
+                            <!-- 使用花枝意麵的圖片代替 -->
+                            <img src="image_721921.jpg" alt="" onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=ㄚ碩鱔魚意麵'">
+                        </div>
+                        <div class="p-6 flex-grow">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-gray-900">ㄚ碩鱔魚意麵</h3>
+                                <span class="bg-secondary text-yellow-900 text-xs px-2 py-1 rounded font-bold">份量滿分</span>
+                            </div>
+                            <p class="text-gray-600">以實在的份量及豐富的配菜被不少網友稱讚，是吃正餐的好選擇。</p>
+                        </div>
+                    </div>
+
+                    <!-- 推薦攤位 3 -->
+                    <div class="stall-card bg-white rounded-xl overflow-hidden border border-gray-100 flex flex-col">
+                        <div class="p-6 flex-grow">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold text-gray-900">迪哥臭豆腐</h3>
+                                <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded font-bold">外酥內嫩</span>
+                            </div>
+                            <p class="text-gray-600">口感外酥內嫩，醬汁夠味，很常被部落客與網紅列入必吃名單中。</p>
+                        </div>
+                    </div>
+
+                    <!-- 推薦攤位 4 -->
+                    <div class="stall-card bg-white rounded-xl overflow-hidden border border-gray-100 flex flex-col">
+                        <div class="p-6 flex-grow">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold text-gray-900">小上海香酥雞</h3>
+                                <span class="bg-primary text-white text-xs px-2 py-1 rounded font-bold">經典炸物</span>
+                            </div>
+                            <p class="text-gray-600">夜市必備的經典炸物小吃，這攤在路竹夜市擁有相當高的人氣。</p>
+                        </div>
+                    </div>
+
+                    <!-- 推薦攤位清單 -->
+                    <div class="stall-card bg-gray-50 rounded-xl p-6 border border-gray-200 lg:col-span-2 flex flex-col justify-center">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            更多影片/網路熱門推薦
+                        </h3>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="bg-white px-4 py-2 rounded-full border border-gray-200 text-gray-700 font-medium shadow-sm hover:border-primary hover:text-primary transition-colors cursor-default">新疆烤肉串</span>
+                            <span class="bg-white px-4 py-2 rounded-full border border-gray-200 text-gray-700 font-medium shadow-sm hover:border-primary hover:text-primary transition-colors cursor-default">黑膽石碳烤玉米</span>
+                            <span class="bg-white px-4 py-2 rounded-full border border-gray-200 text-gray-700 font-medium shadow-sm hover:border-primary hover:text-primary transition-colors cursor-default">吳記酥炸大尾魷魚</span>
+                            <span class="bg-white px-4 py-2 rounded-full border border-gray-200 text-gray-700 font-medium shadow-sm hover:border-primary hover:text-primary transition-colors cursor-default">興達港炸鮮奶</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 現場剪影區塊 (相簿) -->
+        <section id="gallery" class="py-20 bg-gray-900 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold sm:text-4xl text-white">夜市現場剪影</h2>
+                    <div class="mt-2 h-1 w-20 bg-secondary mx-auto rounded"></div>
+                    <p class="mt-4 text-gray-400">感受熱鬧的在地夜市氛圍</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- 相片 1 -->
+                    <div class="relative overflow-hidden rounded-lg group h-64">
+                        <img src="image_721907.jpg" alt="" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/1f2937/94a3b8?text=現場照片'">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <p class="text-white font-bold text-lg px-4 text-center">多樣化的生活百貨與糖果攤</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 相片 2 -->
+                    <div class="relative overflow-hidden rounded-lg group h-64 lg:col-span-2">
+                        <img src="image_721657.jpg" alt="" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://placehold.co/800x400/1f2937/94a3b8?text=空拍照片'">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <p class="text-white font-bold text-lg px-4 text-center">廣闊的四方格子狀動線，好逛不擁擠</p>
+                        </div>
+                    </div>
+
+                    <!-- 相片 3 -->
+                    <div class="relative overflow-hidden rounded-lg group h-64 lg:col-span-2">
+                        <img src="image_721921.jpg" alt="" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://placehold.co/800x400/1f2937/94a3b8?text=美食攤位'">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <p class="text-white font-bold text-lg px-4 text-center">豐富的在地小吃攤位</p>
+                        </div>
+                    </div>
+
+                    <!-- 相片 4 -->
+                    <div class="relative overflow-hidden rounded-lg group h-64">
+                        <img src="image_72159c.jpg" alt="" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/1f2937/94a3b8?text=熱鬧夜景'">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <p class="text-white font-bold text-lg px-4 text-center">越晚越熱鬧的美食區</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 攤商招商資訊 (依據FB資料) -->
+        <section class="py-16 bg-red-50">
+            <div class="max-w-4xl mx-auto px-4 text-center border-2 border-dashed border-red-200 rounded-2xl p-8 bg-white">
+                <h3 class="text-2xl font-bold text-gray-900 mb-4 flex justify-center items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    攤商招商與聯繫
+                </h3>
+                <p class="text-gray-700 mb-6 text-lg">
+                    臨時攤販若需訂位，請於<strong>夜市營業當天中午過後</strong>進行聯繫訂位。
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 text-gray-600">
+                    <div class="flex items-center justify-center gap-2 bg-gray-50 px-4 py-2 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        聯絡電話：07-607-3277
+                    </div>
+                    <a href="https://www.facebook.com/profile.php?id=100054220640955" target="_blank" class="flex items-center justify-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors">
+                        <svg fill="currentColor" viewBox="0 0 24 24" class="h-5 w-5">
+                            <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path>
+                        </svg>
+                        官方 Facebook 粉絲專頁
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-dark text-white py-8 border-t-4 border-primary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-center md:text-left">
+                <h2 class="text-xl font-bold text-secondary mb-1">路竹夜市指南</h2>
+                <p class="text-gray-400 text-sm">高雄市路竹區民富街88號</p>
+            </div>
+            
+            <div class="text-center text-gray-500 text-xs mt-4 md:mt-0 max-w-md">
+                <p class="mb-1 text-yellow-500">聲明：本網站標示僅提供路竹夜市官方參考，不具商業性質，無網域。</p>
+                <p>資料來源彙整自網路公開資訊及粉絲專頁。營業狀況與攤位可能隨時間變動，請依現場實際狀況為準。</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript 互動功能 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 行動版選單切換
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // 點擊行動版選單連結後自動關閉選單
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // 導覽列滾動背景效果
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('shadow-md');
+                    navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+                } else {
+                    navbar.classList.remove('shadow-md');
+                    navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                }
+            });
+
+            // 平滑滾動 (針對某些不支援 CSS scroll-behavior 的舊瀏覽器作為備案，這裡主要依賴 CSS)
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    mobileMenu.classList.add('hidden'); // 確保點擊後關閉手機選單
+                    
+                    const targetId = this.getAttribute('href');
+                    if(targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
